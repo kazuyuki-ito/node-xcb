@@ -1,0 +1,36 @@
+version: 2
+
+jobs:
+  deploy:
+    environment:
+      IMAGE_NAME: kazuyukiito/node-xcb
+    working_directory: /repo
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker Image
+          command: docker build -t $IMAGE_NAME:latest .
+      - run:
+          name: DockerHub Login
+          command: docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+      - run:
+          name: deploy latest image
+          command: docker push $IMAGE_NAME:latest
+      - run:
+          name: deploy tagged image
+          command: |
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$CIRCLE_TAG
+
+workflows:
+  version: 2
+  deploy-workflow:
+    jobs:
+      - deploy:
+          filters:
+            tags:
+              only: /^.*/
+            branches:
+              ignore: /.*/
