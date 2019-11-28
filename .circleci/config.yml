@@ -1,12 +1,14 @@
-version: 2
+version: 2.1
+executors:
+  docker-publisher:
+    environment:
+      IMAGE_NAME: kazuyukiito/node-xcb
+    docker:
+      - image: circleci/buildpack-deps:stretch
 
 jobs:
   deploy:
-    environment:
-      IMAGE_NAME: kazuyukiito/node-xcb
-    working_directory: /repo
-    docker:
-      - image: circleci/buildpack-deps:stretch
+    executors: docker-publisher
     steps:
       - checkout
       - setup_remote_docker
